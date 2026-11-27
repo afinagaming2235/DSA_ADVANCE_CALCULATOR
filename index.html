@@ -3,120 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="DSA Advanced Calculator">
-  <title>DSA Advanced Calculator</title>
+  <meta name="description" content="Gastador - DSA Advanced Calculator">
+  <title>Gastador | DSA Advanced Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div class="brand">∑</div>
-      <div><p class="eyebrow">DATA STRUCTURES &amp; ALGORITHMS</p><h1>Advanced Calculator</h1></div>
-      <span class="project-tag">DSA PROJECT</span>
-    </header>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">∑</div>
+    <div><p class="eyebrow">DATA STRUCTURES &amp; ALGORITHMS</p><h1>Advanced Calculator</h1></div>
+    <span class="project-tag">GASTADOR PROJECT</span>
+  </header>
 
-    <div class="layout">
-      <section class="calculator card">
-        <div class="display">
-          <div class="display-label">MATHEMATICAL EXPRESSION</div>
-          <div id="formulaDisplay" class="formula">0</div>
-          <div class="answer-row"><span>FINAL ANSWER</span><strong id="answerDisplay">0</strong></div>
-        </div>
+  <div class="layout">
+    <section class="card calculator">
+      <div class="display">
+        <div class="display-label">MATHEMATICAL FORMULA</div>
+        <div id="formulaDisplay" class="formula" aria-live="polite">0</div>
+        <div class="answer-row"><span>FINAL ANSWER</span><strong id="answerDisplay">0</strong></div>
+      </div>
 
-        <div class="input-row">
-          <input id="expression" type="text" autocomplete="off" spellcheck="false"
-            placeholder="Enter an expression, e.g. 5! or sum(i=1..5, i)">
-          <button id="calculateBtn" class="calculate-btn">Calculate</button>
-        </div>
-        <p id="status" class="status" role="status">Ready. Enter an expression or use the keypad.</p>
+      <div class="input-row">
+        <input id="expression" type="text" autocomplete="off" placeholder="Enter an expression, e.g. 5! or sum(i=1..5, i)" aria-label="Mathematical expression">
+        <button id="calculateBtn" class="calculate-btn">Calculate</button>
+      </div>
+      <p id="status" class="status" role="status">Ready. Enter an expression or choose an operation.</p>
 
-        <div class="mode-tabs">
-          <button class="mode-tab active" data-mode="basic">Basic</button>
-          <button class="mode-tab" data-mode="scientific">Scientific</button>
-          <button class="mode-tab" data-mode="dsa">DSA Functions</button>
-        </div>
-
+      <section class="basic-panel">
+        <p class="panel-label">BASIC MATHEMATICAL OPERATIONS</p>
         <div class="keypad">
-          <button class="key utility" data-action="clear">AC</button>
-          <button class="key utility" data-action="backspace">⌫</button>
-          <button class="key utility" data-insert="%">%</button>
+          <button class="key utility" data-action="clear" data-insert="AC">AC</button>
+          <button class="key utility" data-insert="(">(</button>
+          <button class="key utility" data-insert=")">)</button>
           <button class="key operator" data-insert="÷">÷</button>
-
-          <button class="key" data-insert="7">7</button><button class="key" data-insert="8">8</button>
-          <button class="key" data-insert="9">9</button><button class="key operator" data-insert="×">×</button>
-
-          <button class="key" data-insert="4">4</button><button class="key" data-insert="5">5</button>
-          <button class="key" data-insert="6">6</button><button class="key operator" data-insert="−">−</button>
-
-          <button class="key" data-insert="1">1</button><button class="key" data-insert="2">2</button>
-          <button class="key" data-insert="3">3</button><button class="key operator" data-insert="+">+</button>
-
-          <button class="key utility" data-insert="(">(</button><button class="key" data-insert="0">0</button>
-          <button class="key" data-insert=".">.</button><button class="key equals" data-action="calculate">=</button>
+          <button class="key" data-insert="7">7</button><button class="key" data-insert="8">8</button><button class="key" data-insert="9">9</button><button class="key operator" data-insert="×">×</button>
+          <button class="key" data-insert="4">4</button><button class="key" data-insert="5">5</button><button class="key" data-insert="6">6</button><button class="key operator" data-insert="-">−</button>
+          <button class="key" data-insert="1">1</button><button class="key" data-insert="2">2</button><button class="key" data-insert="3">3</button><button class="key operator" data-insert="+">+</button>
+          <button class="key utility" data-insert="%">%</button><button class="key" data-insert="0">0</button><button class="key" data-insert=".">.</button><button class="key equals" data-action="calculate">=</button>
         </div>
-
-        <section id="scientificPanel" class="function-panel">
-          <p class="panel-label">SCIENTIFIC OPERATIONS</p>
-          <div class="function-grid">
-            <button class="function-key" data-insert="sqrt(">√ <small>Square root</small></button>
-            <button class="function-key" data-insert="cbrt(">∛ <small>Cube root</small></button>
-            <button class="function-key" data-insert="log(">log <small>Base 10</small></button>
-            <button class="function-key" data-insert="log2(">log₂ <small>Base 2</small></button>
-            <button class="function-key" data-insert="^">xʸ <small>Exponent</small></button>
-            <button class="function-key" data-insert="!">n! <small>Factorial</small></button>
-            <button class="function-key" data-insert="floor(">floor <small>Round down</small></button>
-            <button class="function-key" data-insert="ceil(">ceil <small>Round up</small></button>
-            <button class="function-key" data-insert="intdiv(">a ÷ b <small>Integer division</small></button>
-            <button class="function-key" data-insert="pi">π <small>Pi</small></button>
-            <button class="function-key" data-insert="e">e <small>Euler's number</small></button>
-            <button class="function-key" data-insert=")">) <small>Close group</small></button>
-          </div>
-        </section>
-
-        <section id="dsaPanel" class="function-panel">
-          <p class="panel-label">SUMMATION, PRODUCT &amp; FACTORIALS</p>
-          <div class="function-grid dsa-grid">
-            <button class="function-key" data-insert="sum(i=1..5, i)">Σ <small>Summation</small></button>
-            <button class="function-key" data-insert="product(i=1..4, i)">Π <small>Product</small></button>
-            <button class="function-key" data-insert="doubleSum(i=1..3, j=1..2, i+j)">ΣΣ <small>Double summation</small></button>
-            <button class="function-key" data-insert="doubleProduct(i=1..3, j=1..2, i+j)">ΠΠ <small>Double product</small></button>
-            <button class="function-key" data-insert="fact(">n! <small>Factorial function</small></button>
-            <button class="function-key" data-insert="pow(">aᵇ <small>Power function</small></button>
-          </div>
-          <p class="panel-label variables-title">VARIABLE VALUES</p>
-          <div class="variables">
-            <label>A<input id="varA" type="number" step="any" value="2"></label>
-            <label>B<input id="varB" type="number" step="any" value="3"></label>
-            <label>C<input id="varC" type="number" step="any" value="4"></label>
-            <label>D<input id="varD" type="number" step="any" value="5"></label>
-          </div>
-          <p class="hint">Set values, then use A, B, C, or D in your expression.</p>
-        </section>
+        <p class="panel-label variables-title">ADDITIONAL BASIC OPERATIONS</p>
+        <div class="function-grid">
+          <button class="function-key" data-insert="floor(">Floor<small>Round down</small></button>
+          <button class="function-key" data-insert="ceil(">Ceiling<small>Round up</small></button>
+          <button class="function-key" data-insert="intdiv(">Integer Division<small>Whole-number quotient</small></button>
+        </div>
       </section>
 
-      <aside class="side-column">
-        <section class="card side-card">
-          <div class="side-heading"><div><p class="eyebrow">RECENT RESULTS</p><h2>History</h2></div>
-            <button id="clearHistory" class="clear-btn">Clear</button></div>
-          <div id="historyList" class="history-list"><p class="empty">Your calculations will appear here.</p></div>
-        </section>
-        <section class="card side-card guide">
-          <p class="eyebrow">EXPRESSION GUIDE</p><h2>How to use</h2>
-          <ul>
-            <li><code>5!</code> calculates factorial.</li>
-            <li><code>log(100)</code> is base-10 logarithm.</li>
-            <li><code>log2(8)</code> is binary logarithm.</li>
-            <li><code>sum(i=1..5, i)</code> adds 1 through 5.</li>
-            <li><code>product(i=1..4, i)</code> multiplies 1 through 4.</li>
-            <li><code>7 % 3</code> calculates modulo.</li>
-            <li><code>A * B</code> uses assigned variables.</li>
-          </ul>
-          <div class="note">The calculator displays the mathematical expression and final answer, following the project guidelines.</div>
-        </section>
-      </aside>
-    </div>
-    <footer>DSA Advanced Calculator · HTML, CSS &amp; JavaScript</footer>
-  </main>
-  <script src="script.js"></script>
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="scientific">Scientific</button>
+        <button class="mode-tab" data-mode="dsa">DSA Functions</button>
+      </div>
+
+      <section id="scientificPanel" class="function-panel visible">
+        <p class="panel-label">EXPONENTS, ROOTS &amp; LOGARITHMS</p>
+        <div class="function-grid">
+          <button class="function-key" data-insert="pow(">aᵇ<small>Exponentiation</small></button>
+          <button class="function-key" data-insert="sqrt(">√x<small>Square root</small></button>
+          <button class="function-key" data-insert="cbrt(">∛x<small>Cube root</small></button>
+          <button class="function-key" data-insert="log(">log<small>Base-10 logarithm</small></button>
+          <button class="function-key" data-insert="log2(">log₂<small>Binary logarithm</small></button>
+        </div>
+      </section>
+
+      <section id="dsaPanel" class="function-panel">
+        <p class="panel-label">FACTORIAL OPERATIONS</p>
+        <div class="function-grid">
+          <button class="function-key" data-insert="fact(">n!<small>Factorial</small></button>
+          <button class="function-key" data-insert="5!+3!">a! + b!<small>Addition of factorials</small></button>
+          <button class="function-key" data-insert="5!/3!">a! / b!<small>Division of factorials</small></button>
+        </div>
+        <p class="panel-label variables-title">SUMMATION &amp; PRODUCT NOTATION</p>
+        <div class="function-grid">
+          <button class="function-key" data-insert="sum(i=1..5, i)">Σ<small>Summation</small></button>
+          <button class="function-key" data-insert="doubleSum(i=1..3, j=1..2, i+j)">ΣΣ<small>Double summation</small></button>
+          <button class="function-key" data-insert="product(i=1..4, i)">Π<small>Product notation</small></button>
+          <button class="function-key" data-insert="doubleProduct(i=1..3, j=1..2, i+j)">ΠΠ<small>Double product</small></button>
+        </div>
+      </section>
+
+      <section class="function-panel visible">
+        <p class="panel-label variables-title">ALGEBRAIC EXPRESSIONS &amp; VARIABLES</p>
+        <div class="variables">
+          <label>A<input id="varA" type="number" step="any" value="2"></label>
+          <label>B<input id="varB" type="number" step="any" value="3"></label>
+          <label>C<input id="varC" type="number" step="any" value="4"></label>
+          <label>D<input id="varD" type="number" step="any" value="5"></label>
+        </div>
+        <p class="hint">Assign values to A, B, C, and D before using them in an expression.</p>
+        <div class="function-grid">
+          <button class="function-key" data-insert="A*B">AB<small>Multiplication of variables</small></button>
+          <button class="function-key" data-insert="A+B">A + B<small>Addition of variables</small></button>
+          <button class="function-key" data-insert="A^B">Aʸ<small>Exponentiation</small></button>
+          <button class="function-key" data-insert="3*A">3A<small>Multiplication by a constant</small></button>
+          <button class="function-key" data-insert="A+5">A + 5<small>Addition of a constant</small></button>
+          <button class="function-key" data-insert="A^3">A³<small>Exponentiation by a constant</small></button>
+        </div>
+      </section>
+    </section>
+
+    <aside class="side-column">
+      <section class="card side-card">
+        <div class="side-heading"><div><p class="eyebrow">RECENT RESULTS</p><h2>History</h2></div><button id="clearHistory" class="clear-btn">Clear</button></div>
+        <div id="historyList" class="history-list"><p class="empty">Your calculations will appear here.</p></div>
+      </section>
+
+      <section class="card side-card guide">
+        <p class="eyebrow">EXPRESSION GUIDE</p><h2>How to use</h2>
+        <ul>
+          <li><code>5!</code> calculates factorial.</li>
+          <li><code>sum(i=1..5, i)</code> adds values from 1 to 5.</li>
+          <li><code>product(i=1..4, i)</code> multiplies values from 1 to 4.</li>
+          <li><code>doubleSum(i=1..3, j=1..2, i+j)</code> performs double summation.</li>
+          <li><code>doubleProduct(i=1..3, j=1..2, i+j)</code> performs double product.</li>
+          <li><code>log(100)</code> is base-10; <code>log2(8)</code> is binary logarithm.</li>
+          <li>Use <code>^</code> for exponents and <code>%</code> for modulo.</li>
+          <li>Use <code>floor()</code>, <code>ceil()</code>, and <code>intdiv()</code> for basic operations.</li>
+        </ul>
+        <div class="note">The calculator displays the entered mathematical expression and its final answer without step-by-step solutions.</div>
+      </section>
+
+      <section class="card side-card group-card">
+        <p class="eyebrow">PROJECT GROUP</p><h2>GASTADOR</h2>
+        <p class="group-subtitle">Group Members</p>
+        <ul class="group-members">
+          <li>Maykhaela Macabulos</li>
+          <li>Aharon Joshua Espina</li>
+          <li>Christian Melgar</li>
+          <li>Dwyne Maturgo</li>
+          <li>Kiel Coaching</li>
+        </ul>
+        <div class="group-footer">Data Structures &amp; Algorithms</div>
+      </section>
+    </aside>
+  </div>
+
+  <footer>DSA Advanced Calculator <span>•</span> Developed by Gastador</footer>
+</main>
+<script src="script.js"></script>
 </body>
 </html>
