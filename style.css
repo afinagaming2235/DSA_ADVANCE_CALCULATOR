@@ -84,3 +84,20 @@ footer { margin: 20px 0 4px; color: #9aa3b2; text-align: center; font-size: 11px
   .function-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .input-row { flex-wrap: wrap; } #expression, .calculate-btn { flex-basis: 100%; min-height: 43px; }
   .key { height: 53px; } }
+
+
+/* GASTADOR group members card */
+.group-card {
+  padding-top: 48px;
+}
+.group-card h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.group-members {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #68758a;
+  font-size: 12px;
+  line-height: 2;
+}
