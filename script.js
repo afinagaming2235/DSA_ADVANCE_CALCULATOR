@@ -1,16 +1,22 @@
 
 const $ = (id) => document.getElementById(id);
-
 const expressionInput = $("expression");
+
 let calculationHistory = [];
 
-// DISPLAY STATUS
+// ==============================
+// STATUS MESSAGE
+// ==============================
+
 function setStatus(message, isError = false) {
   $("status").textContent = message;
   $("status").classList.toggle("error", isError);
 }
 
-// INSERT TEXT AT CURSOR
+// ==============================
+// INSERT BUTTON VALUES
+// ==============================
+
 function insertAtCursor(value) {
   const start = expressionInput.selectionStart ?? expressionInput.value.length;
   const end = expressionInput.selectionEnd ?? expressionInput.value.length;
@@ -19,7 +25,10 @@ function insertAtCursor(value) {
   expressionInput.focus();
 }
 
+// ==============================
 // FACTORIAL
+// ==============================
+
 function factorial(n) {
   if (!Number.isInteger(n) || n < 0 || n > 170) {
     throw new Error("Factorial requires a whole number from 0 to 170.");
@@ -34,7 +43,10 @@ function factorial(n) {
   return result;
 }
 
+// ==============================
 // SPLIT FUNCTION ARGUMENTS
+// ==============================
+
 function splitArguments(text) {
   const parts = [];
   let depth = 0;
@@ -56,7 +68,10 @@ function splitArguments(text) {
   return parts;
 }
 
-// FIND MATCHING CLOSING PARENTHESIS
+// ==============================
+// FIND CLOSING PARENTHESIS
+// ==============================
+
 function findClosingParenthesis(text, openIndex) {
   let depth = 0;
 
@@ -75,7 +90,10 @@ function findClosingParenthesis(text, openIndex) {
   return -1;
 }
 
-// PARSE DSA RANGE
+// ==============================
+// PARSE SUMMATION RANGE
+// ==============================
+
 function parseRange(text) {
   const match = text.match(
     /^\s*([a-z])\s*=\s*(-?\d+)\s*\.\.\s*(-?\d+)\s*$/i
@@ -92,7 +110,12 @@ function parseRange(text) {
   };
 }
 
-// DSA OPERATIONS
+// ==============================
+// DSA FUNCTIONS
+// SUMMATION, PRODUCT,
+// DOUBLE SUMMATION, DOUBLE PRODUCT
+// ==============================
+
 function evaluateDSA(text, variables) {
   const pattern = /\b(doubleSum|doubleProduct|sum|product)\s*\(/i;
 
@@ -115,12 +138,13 @@ function evaluateDSA(text, variables) {
 
     let result;
 
-    // SINGLE SUMMATION OR PRODUCT
+    // ==========================
+    // SUMMATION AND PRODUCT
+    // ==========================
+
     if (name === "sum" || name === "product") {
       if (args.length !== 2) {
-        throw new Error(
-          name + " needs a range and an expression."
-        );
+        throw new Error(name + " needs a range and an expression.");
       }
 
       const range = parseRange(args[0]);
@@ -138,28 +162,35 @@ function evaluateDSA(text, variables) {
         step > 0 ? i <= range.end : i >= range.end;
         i += step
       ) {
-        const value = evaluate(args[1], {
+        const currentVariables = {
           ...variables,
           [range.variable]: i
-        });
+        };
 
-        result =
-          name === "sum"
-            ? result + value
-            : result * value;
+        const value = evaluate(args[1], currentVariables);
+
+        result = name === "sum"
+          ? result + value
+          : result * value;
       }
-    }
 
-    // DOUBLE SUMMATION OR PRODUCT
-    else {
+    } else {
+
+      // ==========================
+      // DOUBLE SUMMATION
+      // DOUBLE PRODUCT
+      // ==========================
+
       if (args.length !== 3) {
-        throw new Error(
-          name + " needs two ranges and an expression."
-        );
+        throw new Error(name + " needs two ranges and an expression.");
       }
 
       const first = parseRange(args[0]);
       const second = parseRange(args[1]);
+
+      if (first.variable.toLowerCase() === second.variable.toLowerCase()) {
+        throw new Error("Use different variables for the two ranges.");
+      }
 
       if (
         Math.abs(first.end - first.start) > 1000 ||
@@ -183,23 +214,29 @@ function evaluateDSA(text, variables) {
           stepB > 0 ? j <= second.end : j >= second.end;
           j += stepB
         ) {
-          const value = evaluate(args[2], {
+          const currentVariables = {
             ...variables,
             [first.variable]: i,
             [second.variable]: j
-          });
+          };
 
-          result =
-            name === "doubleSum"
-              ? result + value
-              : result * value;
+          const value = evaluate(args[2], currentVariables);
+
+          result = name === "doubleSum"
+            ? result + value
+            : result * value;
         }
       }
     }
 
+    if (!Number.isFinite(result)) {
+      throw new Error("The result is outside the supported range.");
+    }
+
+    // Replace the DSA function with its calculated result.
     text =
       text.slice(0, match.index) +
-      String(result) +
+      "(" + result + ")" +
       text.slice(close + 1);
   }
 
@@ -210,7 +247,10 @@ function evaluateDSA(text, variables) {
   return text;
 }
 
+// ==============================
 // TOKENIZER
+// ==============================
+
 function tokenize(source) {
   const tokens = [];
 
@@ -231,7 +271,7 @@ function tokenize(source) {
   while (index < source.length) {
     const remaining = source.slice(index);
 
-    const fn = functionNames.find(name =>
+    const fn = functionNames.find((name) =>
       new RegExp("^" + name + "\\b", "i").test(remaining)
     );
 
@@ -284,7 +324,10 @@ function tokenize(source) {
   return tokens;
 }
 
-// MAIN EXPRESSION EVALUATOR
+// ==============================
+// MAIN EVALUATOR
+// ==============================
+
 function evaluate(source, variables = {}) {
   let text = String(source)
     .replace(/[×]/g, "*")
@@ -296,32 +339,46 @@ function evaluate(source, variables = {}) {
     throw new Error("Please enter an expression.");
   }
 
-  // PROCESS DSA OPERATIONS FIRST
+  // Evaluate DSA functions first.
   text = evaluateDSA(text, variables);
 
-  // PROCESS CONSTANTS AND VARIABLES
-  text = text.replace(/\bpi\b/gi, "(" + Math.PI + ")");
+  // ==========================
+  // VARIABLE AND CONSTANT FIX
+  // ==========================
 
-  text = text.replace(/\be\b/g, "(" + Math.E + ")");
-
-  text = text.replace(/[a-z_]\w*/gi, (identifier) => {
-    const key = identifier.toLowerCase();
-
-    const variableKey = Object.keys(variables).find(
-      name => name.toLowerCase() === key
+  text = text.replace(/\b[a-z_]\w*\b/gi, (identifier) => {
+    const key = Object.keys(variables).find(
+      (variable) =>
+        variable.toLowerCase() === identifier.toLowerCase()
     );
 
-    if (variableKey !== undefined) {
-      return "(" + variables[variableKey] + ")";
+    // Replace assigned variables, including i and j.
+    if (key !== undefined) {
+      return "(" + variables[key] + ")";
     }
 
+    // Mathematical constant PI.
+    if (identifier.toLowerCase() === "pi") {
+      return "(" + Math.PI + ")";
+    }
+
+    // Mathematical constant E.
+    if (identifier.toLowerCase() === "e") {
+      return "(" + Math.E + ")";
+    }
+
+    // Keep scientific function names unchanged.
     return identifier;
   });
 
   const tokens = tokenize(text);
+
   let position = 0;
 
-  // PRIMARY EXPRESSIONS
+  // ==========================
+  // PRIMARY
+  // ==========================
+
   function primary() {
     const token = tokens[position++];
 
@@ -346,15 +403,12 @@ function evaluate(source, variables = {}) {
       return value;
     }
 
-    // SCIENTIFIC FUNCTIONS
     if (token.type === "function") {
       if (
         !tokens[position] ||
         tokens[position++].type !== "("
       ) {
-        throw new Error(
-          token.value + " requires parentheses."
-        );
+        throw new Error(token.value + " requires parentheses.");
       }
 
       const first = addSub();
@@ -379,9 +433,7 @@ function evaluate(source, variables = {}) {
       switch (token.value) {
         case "sqrt":
           if (first < 0) {
-            throw new Error(
-              "Square root input must be non-negative."
-            );
+            throw new Error("Square root input must be non-negative.");
           }
           return Math.sqrt(first);
 
@@ -390,17 +442,13 @@ function evaluate(source, variables = {}) {
 
         case "log":
           if (first <= 0) {
-            throw new Error(
-              "Logarithm input must be positive."
-            );
+            throw new Error("Logarithm input must be positive.");
           }
           return Math.log10(first);
 
         case "log2":
           if (first <= 0) {
-            throw new Error(
-              "Logarithm input must be positive."
-            );
+            throw new Error("Logarithm input must be positive.");
           }
           return Math.log2(first);
 
@@ -432,7 +480,10 @@ function evaluate(source, variables = {}) {
     throw new Error("Unexpected symbol.");
   }
 
-  // FACTORIAL
+  // ==========================
+  // POSTFIX FACTORIAL
+  // ==========================
+
   function postfix() {
     let value = primary();
 
@@ -447,7 +498,10 @@ function evaluate(source, variables = {}) {
     return value;
   }
 
-  // EXPONENT
+  // ==========================
+  // POWER
+  // ==========================
+
   function power() {
     const left = postfix();
 
@@ -462,7 +516,10 @@ function evaluate(source, variables = {}) {
     return left;
   }
 
-  // POSITIVE AND NEGATIVE
+  // ==========================
+  // UNARY
+  // ==========================
+
   function unary() {
     if (
       tokens[position] &&
@@ -483,7 +540,10 @@ function evaluate(source, variables = {}) {
     return power();
   }
 
-  // MULTIPLICATION, DIVISION, MODULO
+  // ==========================
+  // MULTIPLICATION AND DIVISION
+  // ==========================
+
   function multiplyDivide() {
     let value = unary();
 
@@ -517,7 +577,10 @@ function evaluate(source, variables = {}) {
     return value;
   }
 
+  // ==========================
   // ADDITION AND SUBTRACTION
+  // ==========================
+
   function addSub() {
     let value = multiplyDivide();
 
@@ -528,37 +591,39 @@ function evaluate(source, variables = {}) {
       const operator = tokens[position++].type;
       const right = multiplyDivide();
 
-      value =
-        operator === "+"
-          ? value + right
-          : value - right;
+      value = operator === "+"
+        ? value + right
+        : value - right;
     }
 
     return value;
   }
 
+  // ==========================
+  // FINAL RESULT
+  // ==========================
+
   const answer = addSub();
 
   if (position !== tokens.length) {
-    throw new Error(
-      "Please check the expression syntax."
-    );
+    throw new Error("Please check the expression syntax.");
   }
 
   if (!Number.isFinite(answer)) {
-    throw new Error(
-      "The result is outside the supported range."
-    );
+    throw new Error("The result is outside the supported range.");
   }
 
   return answer;
 }
 
+// ==============================
 // GET VARIABLE VALUES
+// ==============================
+
 function getVariables() {
   const values = {};
 
-  ["A", "B", "C", "D"].forEach(letter => {
+  ["A", "B", "C", "D"].forEach((letter) => {
     const value = Number($("var" + letter).value);
 
     if (!Number.isFinite(value)) {
@@ -573,7 +638,10 @@ function getVariables() {
   return values;
 }
 
+// ==============================
 // FORMAT ANSWER
+// ==============================
+
 function formatAnswer(value) {
   if (Object.is(value, -0)) {
     value = 0;
@@ -582,22 +650,24 @@ function formatAnswer(value) {
   return Number(value.toPrecision(12)).toString();
 }
 
+// ==============================
 // CALCULATE
+// ==============================
+
 function calculate() {
   const formula = expressionInput.value.trim();
 
   try {
     const answer = evaluate(formula, getVariables());
-    const formattedAnswer = formatAnswer(answer);
 
     $("formulaDisplay").textContent = formula || "0";
-    $("answerDisplay").textContent = formattedAnswer;
+    $("answerDisplay").textContent = formatAnswer(answer);
 
     setStatus("Calculation successful.");
 
     calculationHistory.unshift({
       formula,
-      answer: formattedAnswer
+      answer: formatAnswer(answer)
     });
 
     renderHistory();
@@ -607,7 +677,10 @@ function calculate() {
   }
 }
 
+// ==============================
 // CALCULATION HISTORY
+// ==============================
+
 function renderHistory() {
   const list = $("historyList");
 
@@ -620,7 +693,7 @@ function renderHistory() {
     return;
   }
 
-  calculationHistory.slice(0, 12).forEach(item => {
+  calculationHistory.slice(0, 12).forEach((item) => {
     const button = document.createElement("button");
 
     button.className = "history-item";
@@ -648,15 +721,21 @@ function renderHistory() {
   });
 }
 
-// INSERT BUTTONS
-document.querySelectorAll("[data-insert]").forEach(button => {
+// ==============================
+// INSERT BUTTON EVENTS
+// ==============================
+
+document.querySelectorAll("[data-insert]").forEach((button) => {
   button.addEventListener("click", () => {
     insertAtCursor(button.dataset.insert);
   });
 });
 
+// ==============================
 // ACTION BUTTONS
-document.querySelectorAll("[data-action]").forEach(button => {
+// ==============================
+
+document.querySelectorAll("[data-action]").forEach((button) => {
   button.addEventListener("click", () => {
     const action = button.dataset.action;
 
@@ -672,20 +751,13 @@ document.querySelectorAll("[data-action]").forEach(button => {
 
     } else if (action === "backspace") {
       const start =
-        expressionInput.selectionStart ??
-        expressionInput.value.length;
+        expressionInput.selectionStart ?? expressionInput.value.length;
 
       const end =
-        expressionInput.selectionEnd ??
-        expressionInput.value.length;
+        expressionInput.selectionEnd ?? expressionInput.value.length;
 
       if (start !== end) {
-        expressionInput.setRangeText(
-          "",
-          start,
-          end,
-          "end"
-        );
+        expressionInput.setRangeText("", start, end, "end");
 
       } else if (start > 0) {
         expressionInput.setRangeText(
@@ -704,26 +776,36 @@ document.querySelectorAll("[data-action]").forEach(button => {
   });
 });
 
+// ==============================
 // CALCULATE BUTTON
+// ==============================
+
 $("calculateBtn").addEventListener("click", calculate);
 
-// ENTER KEY
-expressionInput.addEventListener("keydown", event => {
+// Press ENTER to calculate.
+expressionInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     calculate();
   }
 });
 
+// ==============================
 // CLEAR HISTORY
+// ==============================
+
 $("clearHistory").addEventListener("click", () => {
   calculationHistory = [];
   renderHistory();
 });
 
+// ==============================
 // MODE TABS
-document.querySelectorAll(".mode-tab").forEach(tab => {
+// BASIC, SCIENTIFIC, DSA
+// ==============================
+
+document.querySelectorAll(".mode-tab").forEach((tab) => {
   tab.addEventListener("click", () => {
-    document.querySelectorAll(".mode-tab").forEach(item => {
+    document.querySelectorAll(".mode-tab").forEach((item) => {
       item.classList.remove("active");
     });
 
